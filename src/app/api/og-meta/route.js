@@ -72,10 +72,13 @@ export async function POST(request) {
     let thumbnailUrl = null;
     let description = null;
 
-    // YouTube는 oEmbed API로 정확한 제목/썸네일을 가져옴
-    if (source === 'YouTube') {
+    // YouTube/TikTok은 oEmbed API로 정확한 제목/썸네일을 가져옴
+    if (source === 'YouTube' || source === 'TikTok') {
       try {
-        const oembedUrl = `https://www.youtube.com/oembed?url=${encodeURIComponent(parsedUrl.href)}&format=json`;
+        const oembedBase = source === 'YouTube'
+          ? 'https://www.youtube.com/oembed'
+          : 'https://www.tiktok.com/oembed';
+        const oembedUrl = `${oembedBase}?url=${encodeURIComponent(parsedUrl.href)}&format=json`;
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), 5000);
         const res = await fetch(oembedUrl, { signal: controller.signal });

@@ -255,10 +255,13 @@ function ContentPageInner() {
       // 서버 API 없음 (GitHub Pages 등) → 클라이언트 fallback
     }
 
-    // 클라이언트 fallback: YouTube oEmbed
-    if (detectedSource === 'YouTube') {
+    // 클라이언트 fallback: YouTube / TikTok oEmbed
+    if (detectedSource === 'YouTube' || detectedSource === 'TikTok') {
       try {
-        const oembedRes = await fetch(`https://www.youtube.com/oembed?url=${encodeURIComponent(trimmed)}&format=json`);
+        const oembedBase = detectedSource === 'YouTube'
+          ? 'https://www.youtube.com/oembed'
+          : 'https://www.tiktok.com/oembed';
+        const oembedRes = await fetch(`${oembedBase}?url=${encodeURIComponent(trimmed)}&format=json`);
         if (oembedRes.ok) {
           const data = await oembedRes.json();
           if (data.title && !newTitle) setNewTitle(data.title);
@@ -334,7 +337,7 @@ function ContentPageInner() {
   }
 
   return (
-    <main className="mx-auto w-full max-w-[440px]">
+    <main className="mx-auto w-full max-w-[440px] pb-[30px]">
       <PageHeader
         title="콘텐츠 목록"
         rightContent={
