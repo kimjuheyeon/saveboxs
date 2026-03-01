@@ -5,11 +5,11 @@ import { Check, FolderPlus, Pencil, Plus, Search, Trash2, X } from 'lucide-react
 import PageHeader from '@/components/PageHeader';
 import ListItem from '@/components/ListItem';
 import { ICON_BUTTON_BASE_CLASS, ICON_BUTTON_ICON_SIZE, ICON_BUTTON_SIZE_CLASS } from '@/lib/iconUI';
-import { COLOR_TAGS } from '@/lib/prototypeData';
-import { Button } from '@/components/ui/button';
-import { fetchCollections, createCollection, deleteCollections, deleteContentsInCollections } from '@/lib/api';
 
-const COLOR_CHOICES = ['Red', 'Orange', 'Yellow', 'Green', 'Blue', 'Purple', 'Pink', 'Gray'];
+import { Button } from '@/components/ui/button';
+import { fetchCollections, createCollection, deleteCollections, deleteContentsInCollections, migrateGuestData } from '@/lib/api';
+
+
 
 export default function CollectionsPage() {
   const [collections, setCollections] = useState([]);
@@ -17,7 +17,7 @@ export default function CollectionsPage() {
   const [editing, setEditing] = useState(false);
   const [selectedIds, setSelectedIds] = useState([]);
   const [newName, setNewName] = useState('');
-  const [newColor, setNewColor] = useState('Blue');
+
   const [creating, setCreating] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
   const [removableIds, setRemovableIds] = useState([]);
@@ -25,6 +25,7 @@ export default function CollectionsPage() {
   useEffect(() => {
     async function load() {
       try {
+        await migrateGuestData();
         const data = await fetchCollections();
         setCollections(data);
       } catch (err) {
@@ -106,10 +107,9 @@ export default function CollectionsPage() {
     if (!trimmed || isDuplicate(trimmed)) return;
 
     try {
-      const newCol = await createCollection({ name: trimmed, colorTag: newColor });
+      const newCol = await createCollection({ name: trimmed });
       setCollections((prev) => [newCol, ...prev]);
       setNewName('');
-      setNewColor('Blue');
       setCreating(false);
     } catch (err) {
       alert('컬렉션 생성에 실패했습니다.');
@@ -269,27 +269,6 @@ export default function CollectionsPage() {
                   )}
                 </label>
 
-                <div>
-                  <p className="mb-2 text-xs font-semibold text-[#777777]">컬러 태그</p>
-                  <div className="flex flex-wrap gap-2">
-                    {COLOR_CHOICES.map((color) => {
-                      const colorMeta = COLOR_TAGS[color];
-                      const active = color === newColor;
-                      return (
-                        <button
-                          key={color}
-                          type="button"
-                          onClick={() => setNewColor(color)}
-                          className={`rounded-[8px] border px-3 py-1 text-xs font-semibold transition ${
-                            active ? 'border-[#3385FF] text-[#3385FF] active:bg-indigo-900' : 'border-[#323232] text-[#777777] hover:bg-[#212b42] active:bg-[#283350]'
-                          } ${colorMeta.badge}`}
-                        >
-                          {color}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
               </div>
 
               <Button

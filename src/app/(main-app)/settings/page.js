@@ -8,7 +8,7 @@ import PageHeader from '@/components/PageHeader';
 import ActionSnackbar from '@/components/ActionSnackbar';
 import GoogleMaterialButton from '@/components/GoogleMaterialButton';
 import { getSupabaseBrowserClientSafe } from '@/lib/supabase/client';
-import { deleteAllContents } from '@/lib/api';
+import { deleteAllContents, clearUserIdCache } from '@/lib/api';
 
 const AUTH_STATES = {
   anonymous: 'anonymous',
@@ -275,6 +275,7 @@ export default function SettingsPage() {
         await supabase.auth.signOut();
       }
 
+      clearUserIdCache();
       setSessionUser(null);
       setAuthState({ type: AUTH_STATES.anonymous, email: '비로그인 상태' });
       showToast('로그아웃되었습니다.');
@@ -306,6 +307,7 @@ export default function SettingsPage() {
         await supabase.auth.signOut();
       }
 
+      clearUserIdCache();
       setSessionUser(null);
       setAuthState({ type: AUTH_STATES.anonymous, email: '비로그인 상태' });
       showToast('계정이 삭제되었어요.');

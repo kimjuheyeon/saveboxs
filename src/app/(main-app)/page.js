@@ -6,7 +6,7 @@ import { Plus, Search } from 'lucide-react';
 import PageHeader from '@/components/PageHeader';
 import ListItem from '@/components/ListItem';
 import { getInitial, getSourceMeta } from '@/lib/prototypeData';
-import { fetchContents, fetchCollections } from '@/lib/api';
+import { fetchContents, fetchCollections, migrateGuestData } from '@/lib/api';
 import { ICON_BUTTON_BASE_CLASS, ICON_BUTTON_ICON_SIZE, ICON_BUTTON_SIZE_CLASS } from '@/lib/iconUI';
 
 export default function MainDashboardPage() {
@@ -17,6 +17,7 @@ export default function MainDashboardPage() {
   useEffect(() => {
     async function load() {
       try {
+        await migrateGuestData();
         const [contentsResult, collections] = await Promise.all([
           fetchContents({ limit: 8 }),
           fetchCollections(),
